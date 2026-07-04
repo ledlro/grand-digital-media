@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Clean Minimalism Color Palette Overrides - Blue & White Theme */
+  --color-blue-50: #f0f6ff;
+  --color-blue-100: #e0ecff;
+  --color-blue-200: #c7deff;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #1d4ed8;
+  --color-blue-700: #1e40af;
+  --color-blue-800: #1e3a8a;
+  --color-blue-900: #172554;
+  --color-blue-950: #0c122c;
+
+  --color-indigo-50: #f0f6ff;
+  --color-indigo-100: #e0ecff;
+  --color-indigo-200: #c7deff;
+  --color-indigo-500: #3b82f6;
+  --color-indigo-600: #1d4ed8;
+  --color-indigo-700: #1e40af;
+  --color-indigo-800: #1e3a8a;
+  --color-indigo-900: #172554;
+  --color-indigo-950: #0c122c;
+
+  /* Beautiful high-end neutral grays */
+  --color-slate-50: #f9fafb;
+  --color-slate-100: #f3f4f6;
+  --color-slate-200: #e5e7eb;
+  --color-slate-300: #d1d5db;
+  --color-slate-400: #9ca3af;
+  --color-slate-500: #6b7280;
+  --color-slate-600: #4b5563;
+  --color-slate-700: #374151;
+  --color-slate-800: #1f2937;
+  --color-slate-900: #111827;
+  --color-slate-950: #030712;
+}
+
+/* Scrollbar styling matching the Clean Minimalism look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-slate-200);
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-slate-800);
+}
+
+/* Standard animation utility overrides if needed */
+.theme-emerald {
+  --color-blue-600: #10b981;
+}
