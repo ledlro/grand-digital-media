@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Order, Customer, Product, Workflow, Staff, Expense, InventoryItem, Settings, ActivityLog, Attendance } from '../types';
 import { db } from '../lib/firebase';
-import { collection, doc, getDocs, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, deleteDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'motion/react';
 import { AlertTriangle } from 'lucide-react';
 
@@ -324,11 +324,26 @@ export const DbProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   useEffect(() => {
     const loadAllData = async () => {
       try {
+        // ---- One-time seeding guard ----
+        // Previously, any collection found empty (snap.empty) was
+        // auto-reseeded with sample data on every login — including when
+        // a user had deliberately deleted everything. That made deletions
+        // look like they "didn't work" because the defaults silently came
+        // back on next login. This marker document makes seeding happen
+        // ONLY the very first time the app ever runs against this
+        // Firestore project, never again afterward, no matter how empty
+        // a collection becomes later.
+        const seedStatusRef = doc(db, 'meta', 'seedStatus');
+        const seedStatusSnap = await getDoc(seedStatusRef);
+        const alreadySeeded = seedStatusSnap.exists();
+
         // Load settings
         const settingsSnap = await getDocs(collection(db, 'settings'));
         let finalSettings = DEFAULT_SETTINGS;
         if (settingsSnap.empty) {
-          await setDoc(doc(db, 'settings', 'appSettings'), DEFAULT_SETTINGS);
+          if (!alreadySeeded) {
+            await setDoc(doc(db, 'settings', 'appSettings'), DEFAULT_SETTINGS);
+          }
         } else {
           const found = settingsSnap.docs.find(d => d.id === 'appSettings');
           if (found) {
@@ -338,11 +353,16 @@ export const DbProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         setSettings(finalSettings);
         localSet('settings', finalSettings);
 
-        // Helper to load collection with seeding
+        // Helper to load a collection, seeding defaults ONLY on first-ever run
         const loadCollection = async (colName: string, defaults: any[]) => {
           const snap = await getDocs(collection(db, colName));
           if (snap.empty) {
-            // Seed defaults to Firestore
+            if (alreadySeeded) {
+              // Collection is legitimately empty (e.g. user deleted
+              // everything) — respect that, do not resurrect defaults.
+              return [];
+            }
+            // First-ever run for this project: seed defaults to Firestore
             for (const item of defaults) {
               const docId = item.id || item.name || 'default_id';
               await setDoc(doc(db, colName, docId), item);
@@ -390,6 +410,12 @@ export const DbProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         );
         setLogs(sortedLogs);
         localSet('logs', sortedLogs);
+
+        // Record that seeding has happened (only writes the first time —
+        // subsequent runs see alreadySeeded = true and skip all reseeding).
+        if (!alreadySeeded) {
+          await setDoc(seedStatusRef, { seededAt: new Date().toISOString() });
+        }
 
         console.log('Successfully connected and synchronized with cloud Firestore database.');
 
