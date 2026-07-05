@@ -1,0 +1,6 @@
+{
+  "name": "Grand Digital Media ERP",
+  "description": "Complete ERP and Shop Management system for Grand Digital Media, Kunnamkulam. Replicates Google Sheets workflows with advanced dashboards, workflows, order tracking, invoice printing, and inventory controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
