@@ -101,12 +101,12 @@ const DEFAULT_WORKFLOWS: Workflow[] = [
 ];
 
 const DEFAULT_PRODUCTS: Product[] = [
-  { id: 'PRD-0001', name: 'Flex Banner (Star Media)', category: 'Flex Printing', price: 15, gstPercent: 18, description: 'High quality glossy star frontlit flex banner printing.', stock: 12000, workflowId: 'WF-0001' },
-  { id: 'PRD-0002', name: 'Vinyl Sticker (Self Adhesive)', category: 'Sticker Printing', price: 35, gstPercent: 18, description: 'Waterproof self adhesive white glossy vinyl sticker sheets.', stock: 5000, workflowId: 'WF-0001' },
-  { id: 'PRD-0003', name: 'Premium Wedding Invitation Card', category: 'Card Printing', price: 25, gstPercent: 12, description: 'Elegant folded wedding card on premium texture sheet.', stock: 2000, workflowId: 'WF-0002' },
-  { id: 'PRD-0004', name: 'LED Sign Board (Custom)', category: 'Signage', price: 14500, gstPercent: 18, description: 'Waterproof outdoor LED display light board with aluminum framing.', stock: 8, workflowId: 'WF-0003' },
-  { id: 'PRD-0005', name: 'Business Cards (Double Sided)', category: 'Commercial Print', price: 1.5, gstPercent: 12, description: 'Standard 350GSM card paper with matte lamination.', stock: 8500, workflowId: 'WF-0001' },
-  { id: 'PRD-0006', name: 'Glossy Foam Board (5mm)', category: 'Indoor Display', price: 120, gstPercent: 18, description: 'Vinyl mount on lightweight durable foam sheet.', stock: 250, workflowId: 'WF-0001' }
+  { id: 'PRD-0001', name: 'Flex Banner (Star Media)', category: 'Flex Printing', price: 15, gstPercent: 18, description: 'High quality glossy star frontlit flex banner printing.', stock: 12000, workflowId: 'WF-0001', minimumStock: 1000, stockIn: 12000, stockOut: 0, supplier: 'Classic Media Cochin', lastUpdated: new Date().toISOString() },
+  { id: 'PRD-0002', name: 'Vinyl Sticker (Self Adhesive)', category: 'Sticker Printing', price: 35, gstPercent: 18, description: 'Waterproof self adhesive white glossy vinyl sticker sheets.', stock: 5000, workflowId: 'WF-0001', minimumStock: 500, stockIn: 5000, stockOut: 0, supplier: 'StickMark Bangalore', lastUpdated: new Date().toISOString() },
+  { id: 'PRD-0003', name: 'Premium Wedding Invitation Card', category: 'Card Printing', price: 25, gstPercent: 12, description: 'Elegant folded wedding card on premium texture sheet.', stock: 2000, workflowId: 'WF-0002', minimumStock: 200, stockIn: 2000, stockOut: 0, supplier: 'FinePaper Coimbatore', lastUpdated: new Date().toISOString() },
+  { id: 'PRD-0004', name: 'LED Sign Board (Custom)', category: 'Signage', price: 14500, gstPercent: 18, description: 'Waterproof outdoor LED display light board with aluminum framing.', stock: 8, workflowId: 'WF-0003', minimumStock: 2, stockIn: 8, stockOut: 0, supplier: 'SignSupply Ernakulam', lastUpdated: new Date().toISOString() },
+  { id: 'PRD-0005', name: 'Business Cards (Double Sided)', category: 'Commercial Print', price: 1.5, gstPercent: 12, description: 'Standard 350GSM card paper with matte lamination.', stock: 8500, workflowId: 'WF-0001', minimumStock: 500, stockIn: 8500, stockOut: 0, supplier: 'FinePaper Coimbatore', lastUpdated: new Date().toISOString() },
+  { id: 'PRD-0006', name: 'Glossy Foam Board (5mm)', category: 'Indoor Display', price: 120, gstPercent: 18, description: 'Vinyl mount on lightweight durable foam sheet.', stock: 250, workflowId: 'WF-0001', minimumStock: 30, stockIn: 250, stockOut: 0, supplier: 'SignSupply Ernakulam', lastUpdated: new Date().toISOString() }
 ];
 
 const DEFAULT_STAFF: Staff[] = [
@@ -546,6 +546,11 @@ export const DbProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       description: product.description || '',
       stock: Number(product.stock) || 0,
       workflowId: product.workflowId || '',
+      minimumStock: Number(product.minimumStock) || 0,
+      stockIn: Number(product.stockIn) || 0,
+      stockOut: Number(product.stockOut) || 0,
+      supplier: product.supplier || '',
+      lastUpdated: new Date().toISOString(),
     };
 
     if (isNew) {

@@ -53,6 +53,11 @@ export interface Product {
   description: string; // Description
   stock: number; // Stock
   workflowId: string; // Workflow ID
+  minimumStock: number; // Low-stock alert threshold
+  stockIn: number; // Total stock received
+  stockOut: number; // Total stock consumed/sold
+  supplier: string; // Primary supplier name
+  lastUpdated: string; // Last stock update timestamp
 }
 
 export interface Workflow {
@@ -125,4 +130,3 @@ export interface Attendance {
   notes?: string;
   markedBy: string;
 }
-

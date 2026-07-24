@@ -17,6 +17,10 @@ export default function ProductsView() {
   const [gstPercent, setGstPercent] = useState(18);
   const [description, setDescription] = useState('');
   const [stock, setStock] = useState(0);
+  const [minimumStock, setMinimumStock] = useState(0);
+  const [stockIn, setStockIn] = useState(0);
+  const [stockOut, setStockOut] = useState(0);
+  const [supplier, setSupplier] = useState('');
   const [workflowId, setWorkflowId] = useState('');
 
   if (!currentUser) return null;
@@ -47,6 +51,10 @@ export default function ProductsView() {
         setGstPercent(p.gstPercent);
         setDescription(p.description || '');
         setStock(p.stock);
+        setMinimumStock(p.minimumStock || 0);
+        setStockIn(p.stockIn || 0);
+        setStockOut(p.stockOut || 0);
+        setSupplier(p.supplier || '');
         setWorkflowId(p.workflowId || '');
       }
     } else {
@@ -57,6 +65,10 @@ export default function ProductsView() {
       setGstPercent(18);
       setDescription('');
       setStock(0);
+      setMinimumStock(0);
+      setStockIn(0);
+      setStockOut(0);
+      setSupplier('');
       setWorkflowId('');
     }
     setIsModalOpen(true);
@@ -77,6 +89,10 @@ export default function ProductsView() {
       gstPercent,
       description,
       stock,
+      minimumStock,
+      stockIn,
+      stockOut,
+      supplier,
       workflowId
     });
 
@@ -123,6 +139,7 @@ export default function ProductsView() {
                 <th className="p-4 font-bold text-slate-400 uppercase tracking-wider">Base Rate</th>
                 <th className="p-4 font-bold text-slate-400 uppercase tracking-wider">GST Bracket</th>
                 <th className="p-4 font-bold text-slate-400 uppercase tracking-wider">Virtual Stock</th>
+                <th className="p-4 font-bold text-slate-400 uppercase tracking-wider">Supplier</th>
                 <th className="p-4 font-bold text-slate-400 uppercase tracking-wider">Production Pipe</th>
                 <th className="p-4 font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
               </tr>
@@ -130,8 +147,9 @@ export default function ProductsView() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
               {products.map(p => {
                 const boundWf = workflows.find(w => w.id === p.workflowId);
+                const isLow = p.stock < (p.minimumStock || 0);
                 return (
-                  <tr key={p.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                  <tr key={p.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors ${isLow ? 'bg-rose-500/5 dark:bg-rose-950/5' : ''}`}>
                     <td className="p-4 font-extrabold text-slate-800 dark:text-slate-200">{p.id}</td>
                     <td className="p-4">
                       <div className="font-bold text-slate-800 dark:text-slate-300">{p.name}</div>
@@ -146,7 +164,20 @@ export default function ProductsView() {
                       {currency} {p.price.toFixed(2)}
                     </td>
                     <td className="p-4 font-bold text-slate-500 dark:text-slate-400">{p.gstPercent}% GST</td>
-                    <td className="p-4 font-bold text-slate-600 dark:text-slate-400">{p.stock.toLocaleString()} units</td>
+                    <td className="p-4 font-bold text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5">
+                        <span className={isLow ? 'text-rose-600 dark:text-rose-400' : ''}>{p.stock.toLocaleString()} units</span>
+                        {isLow && (
+                          <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[8px] font-black uppercase tracking-wider animate-pulse">
+                            Low
+                          </span>
+                        )}
+                      </div>
+                      {(p.minimumStock ?? 0) > 0 && (
+                        <div className="text-[10px] text-slate-400 font-semibold mt-0.5">Min: {p.minimumStock}</div>
+                      )}
+                    </td>
+                    <td className="p-4 text-slate-600 dark:text-slate-400 font-semibold">{p.supplier || 'N/A'}</td>
                     <td className="p-4">
                       {boundWf ? (
                         <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded font-bold text-[10px] uppercase tracking-wider">
@@ -259,6 +290,49 @@ export default function ProductsView() {
                       value={stock}
                       onChange={(e) => setStock(Math.max(0, parseInt(e.target.value, 10) || 0))}
                       className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-2.5 rounded-xl text-xs font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Minimum Alert Level</label>
+                    <input 
+                      type="number" 
+                      value={minimumStock}
+                      onChange={(e) => setMinimumStock(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-2.5 rounded-xl text-xs font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Primary Supplier Name</label>
+                    <input 
+                      type="text" 
+                      value={supplier}
+                      onChange={(e) => setSupplier(e.target.value)}
+                      placeholder="e.g. Classic Media Cochin"
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-2.5 rounded-xl text-xs font-semibold"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Total Stock In</label>
+                    <input 
+                      type="number" 
+                      value={stockIn}
+                      onChange={(e) => setStockIn(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-lg text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Total Stock Out</label>
+                    <input 
+                      type="number" 
+                      value={stockOut}
+                      onChange={(e) => setStockOut(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-lg text-xs"
                     />
                   </div>
                 </div>
